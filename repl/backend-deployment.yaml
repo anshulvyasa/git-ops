@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: repl-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: repl-backend
+  template:
+    metadata:
+      labels:
+        app: repl-backend
+    spec:
+      containers:
+        - name: backend-repl
+          image: omega840/brepl:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: repl-secrets
+                  key: DATABASE_URL
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: repl-secrets
+                  key: AUTH_SECRET
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: repl-secrets
+                  key: PORT
+            - name: ORIGIN
+              valueFrom:
+                secretKeyRef:
+                  name: repl-secrets
+                  key: BACKEND_ORIGIN
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: repl-configmap
+                  key: NODE_ENV
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "400Mi"

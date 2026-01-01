@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: repl-configmap
+data:
+  AUTH_TRUST_HOST: "true"
+  AUTH_URL: "https://repl.techynimbus.com"
+  NODE_ENV: "production"

@@ -1,0 +1,66 @@
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: repl-gateway
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - name: repl-http
+      port: 80
+      protocol: HTTP
+      hostname: "repl.vyassa.dev"
+    - name: brepl-http
+      port: 80
+      protocol: HTTP
+      hostname: "brepl.vyassa.dev"
+    - name: repl-https
+      port: 443
+      protocol: HTTPS
+      hostname: "repl.vyassa.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: vyassa-tls
+    - name: brepl-https
+      port: 443
+      protocol: HTTPS
+      hostname: "brepl.vyassa.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: vyassa-tls
+
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: repl-frontend-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: repl-gateway
+  hostnames:
+    - "repl.vyassa.dev"
+  rules:
+    - backendRefs:
+        - name: test-service-for-nginx
+          port: 80
+
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: repl-backend-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: repl-gateway
+  hostnames:
+    - "brepl.vyassa.dev"
+  rules:
+    - backendRefs:
+        - name: test-service-for-nginx
+          port: 80
