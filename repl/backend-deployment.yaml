@@ -50,3 +50,16 @@ spec:
             limits:
               cpu: "500m"
               memory: "400Mi"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend-repl-clusterip-service
+spec:
+  selector:
+    app: repl-backend
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
